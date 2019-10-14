@@ -1,0 +1,3 @@
+name: Bigger Barrels
+main: io.github.larttyler.biggerbarrels.BiggerBarrelsPlugin
+version: ${project.version}
