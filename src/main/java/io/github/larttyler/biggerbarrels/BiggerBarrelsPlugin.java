@@ -1,5 +1,7 @@
 package io.github.larttyler.biggerbarrels;
 
+import io.github.larttyler.biggerbarrels.event.listeners.BarrelBlockChangeListener;
+import io.github.larttyler.biggerbarrels.event.listeners.BarrelInteractListener;
 import io.github.larttyler.biggerbarrels.event.listeners.BarrelRecipeListener;
 import io.github.larttyler.biggerbarrels.recipes.BarrelRecipe;
 import org.bukkit.Bukkit;
@@ -17,6 +19,9 @@ public final class BiggerBarrelsPlugin extends JavaPlugin {
 		instance = this;
 
 		Bukkit.getServer().addRecipe(new BarrelRecipe());
+
 		Bukkit.getPluginManager().registerEvents(new BarrelRecipeListener(), this);
+		Bukkit.getPluginManager().registerEvents(new BarrelInteractListener(), this);
+		Bukkit.getPluginManager().registerEvents(new BarrelBlockChangeListener(), this);
 	}
 }
