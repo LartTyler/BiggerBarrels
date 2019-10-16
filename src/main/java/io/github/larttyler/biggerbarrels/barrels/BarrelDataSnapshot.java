@@ -3,10 +3,10 @@ package io.github.larttyler.biggerbarrels.barrels;
 import org.bukkit.Material;
 
 public class BarrelDataSnapshot {
-	private int tier;
-	private Material type;
-	private int amount;
-	private int maxAmount;
+	private final int tier;
+	private final Material type;
+	private final int amount;
+	private final int maxAmount;
 
 	public BarrelDataSnapshot(BarrelData data) {
 		tier = data.getTier();

@@ -1,6 +1,6 @@
 package io.github.larttyler.biggerbarrels.event.listeners;
 
-import io.github.larttyler.biggerbarrels.persistence.keys.ItemKeys;
+import io.github.larttyler.biggerbarrels.barrels.BarrelItemStack;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,17 +32,17 @@ public class BarrelRecipeListener implements Listener {
 			ItemMeta meta = item.getItemMeta();
 			PersistentDataContainer data = meta.getPersistentDataContainer();
 
-			if (meta == null || !data.has(ItemKeys.Tier, PersistentDataType.INTEGER))
+			if (meta == null || !data.has(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER))
 				return;
 
-			int currentTier = data.get(ItemKeys.Tier, PersistentDataType.INTEGER);
+			int currentTier = data.get(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER);
 
 			if (tier == 0)
 				tier = currentTier;
 			else if (currentTier != tier)
 				return;
 
-			if (data.has(ItemKeys.ContentType, PersistentDataType.STRING)) {
+			if (data.has(BarrelItemStack.CONTENT_TYPE_KEY, PersistentDataType.STRING)) {
 				// Cannot upgrade using two barrels that already contain items
 				if (resultMeta != null)
 					return;
@@ -57,7 +57,7 @@ public class BarrelRecipeListener implements Listener {
 			resultMeta = result.getItemMeta();
 
 		resultMeta.setDisplayName("Tier " + (tier + 1) + " Barrel");
-		resultMeta.getPersistentDataContainer().set(ItemKeys.Tier, PersistentDataType.INTEGER, tier + 1);
+		resultMeta.getPersistentDataContainer().set(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER, tier + 1);
 
 		result.setItemMeta(resultMeta);
 

@@ -3,10 +3,10 @@ package io.github.larttyler.biggerbarrels.barrels;
 import org.bukkit.Material;
 
 public class BarrelData {
-	private int tier;
+	private final int tier;
+	private final int maxAmount;
 	private Material type;
 	private int amount;
-	private int maxAmount;
 
 	public BarrelData(int tier) {
 		this(tier, null, 0);
