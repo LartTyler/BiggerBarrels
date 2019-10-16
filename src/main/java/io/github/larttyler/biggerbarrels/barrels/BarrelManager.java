@@ -1,15 +1,11 @@
 package io.github.larttyler.biggerbarrels.barrels;
 
 import io.github.larttyler.biggerbarrels.BiggerBarrelsPlugin;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,10 +23,6 @@ public class BarrelManager {
 
 	public static boolean has(Block block) {
 		return tracked.containsKey(block);
-	}
-
-	public static void add(Block block, BarrelData data) {
-		tracked.put(block, data);
 	}
 
 	public static BarrelUpdateResult store(Block block, ItemStack item) {
@@ -91,30 +83,10 @@ public class BarrelManager {
 	}
 
 	public static void place(ItemStack item, Block block) {
-		PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
+		BarrelData data = BarrelData.fromItemStack(item);
 
-		if (!container.has(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER))
+		if (data == null)
 			return;
-
-		BarrelData data = new BarrelData(container.get(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER));
-
-		if (container.has(BarrelItemStack.CONTENT_TYPE_KEY, PersistentDataType.STRING)) {
-			Validate.isTrue(
-				container.has(BarrelItemStack.CONTENT_AMOUNT_KEY, PersistentDataType.INTEGER),
-				"Item is tagged with a barrel content type, but has no amount"
-			);
-
-			Material type;
-
-			try {
-				type = Material.valueOf(container.get(BarrelItemStack.CONTENT_TYPE_KEY, PersistentDataType.STRING));
-			} catch (IllegalArgumentException exception) {
-				throw new IllegalArgumentException("Barrel ContentType is not a valid material", exception);
-			}
-
-			data.setType(type);
-			data.setAmount(container.get(BarrelItemStack.CONTENT_AMOUNT_KEY, PersistentDataType.INTEGER));
-		}
 
 		tracked.put(block, data);
 	}
@@ -125,23 +97,16 @@ public class BarrelManager {
 		if (data == null)
 			return;
 
-		ItemStack drop = new ItemStack(Material.BARREL);
+		Bukkit.getScheduler().runTask(BiggerBarrelsPlugin.instance(), () -> {
+			BarrelItemStack drop;
 
-		ItemMeta meta = drop.getItemMeta();
-		assert meta != null;
+			if (data.getType() == null)
+				drop = new BarrelItemStack(data.getTier());
+			else
+				drop = new BarrelItemStack(data.getTier(), data.getType(), data.getAmount());
 
-		PersistentDataContainer container = meta.getPersistentDataContainer();
-		container.set(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER, data.getTier());
-
-		if (data.getType() != null) {
-			container.set(BarrelItemStack.CONTENT_TYPE_KEY, PersistentDataType.STRING, data.getType().toString());
-			container.set(BarrelItemStack.CONTENT_AMOUNT_KEY, PersistentDataType.INTEGER, data.getAmount());
-		}
-
-		Bukkit.getScheduler().runTask(
-			BiggerBarrelsPlugin.instance(),
-			() -> block.getWorld().dropItemNaturally(block.getLocation(), drop)
-		);
+			block.getWorld().dropItemNaturally(block.getLocation(), drop);
+		});
 	}
 
 	public static void destroy(Block block) {

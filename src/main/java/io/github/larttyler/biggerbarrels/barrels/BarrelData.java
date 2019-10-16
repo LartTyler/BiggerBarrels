@@ -1,6 +1,10 @@
 package io.github.larttyler.biggerbarrels.barrels;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 public class BarrelData {
 	private final int tier;
@@ -51,5 +55,34 @@ public class BarrelData {
 
 	public boolean isFull() {
 		return getAmount() == getMaxAmount();
+	}
+
+	public static BarrelData fromItemStack(ItemStack item) {
+		PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
+
+		if (!container.has(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER))
+			return null;
+
+		BarrelData data = new BarrelData(container.get(BarrelItemStack.TIER_KEY, PersistentDataType.INTEGER));
+
+		if (container.has(BarrelItemStack.CONTENT_TYPE_KEY, PersistentDataType.STRING)) {
+			Validate.isTrue(
+				container.has(BarrelItemStack.CONTENT_AMOUNT_KEY, PersistentDataType.INTEGER),
+				"Item is tagged with a barrel content type, but has no amount"
+			);
+
+			Material type;
+
+			try {
+				type = Material.valueOf(container.get(BarrelItemStack.CONTENT_TYPE_KEY, PersistentDataType.STRING));
+			} catch (IllegalArgumentException exception) {
+				throw new IllegalArgumentException("Barrel ContentType is not a valid material", exception);
+			}
+
+			data.setType(type);
+			data.setAmount(container.get(BarrelItemStack.CONTENT_AMOUNT_KEY, PersistentDataType.INTEGER));
+		}
+
+		return data;
 	}
 }
