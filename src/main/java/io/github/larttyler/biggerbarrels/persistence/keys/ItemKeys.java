@@ -3,7 +3,7 @@ package io.github.larttyler.biggerbarrels.persistence.keys;
 import io.github.larttyler.biggerbarrels.BiggerBarrelsPlugin;
 import org.bukkit.NamespacedKey;
 
-public class CommonKeys {
+public class ItemKeys {
 	public static final NamespacedKey Tier;
 	public static final NamespacedKey ContentType;
 	public static final NamespacedKey ContentAmount;

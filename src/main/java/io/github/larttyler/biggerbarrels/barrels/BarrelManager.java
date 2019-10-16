@@ -1,7 +1,7 @@
 package io.github.larttyler.biggerbarrels.barrels;
 
 import io.github.larttyler.biggerbarrels.BiggerBarrelsPlugin;
-import io.github.larttyler.biggerbarrels.persistence.keys.CommonKeys;
+import io.github.larttyler.biggerbarrels.persistence.keys.ItemKeys;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -94,27 +94,27 @@ public class BarrelManager {
 	public static void place(ItemStack item, Block block) {
 		PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
 
-		if (!container.has(CommonKeys.Tier, PersistentDataType.INTEGER))
+		if (!container.has(ItemKeys.Tier, PersistentDataType.INTEGER))
 			return;
 
-		BarrelData data = new BarrelData(container.get(CommonKeys.Tier, PersistentDataType.INTEGER));
+		BarrelData data = new BarrelData(container.get(ItemKeys.Tier, PersistentDataType.INTEGER));
 
-		if (container.has(CommonKeys.ContentType, PersistentDataType.STRING)) {
+		if (container.has(ItemKeys.ContentType, PersistentDataType.STRING)) {
 			Validate.isTrue(
-				container.has(CommonKeys.ContentAmount, PersistentDataType.INTEGER),
+				container.has(ItemKeys.ContentAmount, PersistentDataType.INTEGER),
 				"Item is tagged with a barrel content type, but has no amount"
 			);
 
 			Material type;
 
 			try {
-				type = Material.valueOf(container.get(CommonKeys.ContentType, PersistentDataType.STRING));
+				type = Material.valueOf(container.get(ItemKeys.ContentType, PersistentDataType.STRING));
 			} catch (IllegalArgumentException exception) {
 				throw new IllegalArgumentException("Barrel ContentType is not a valid material", exception);
 			}
 
 			data.setType(type);
-			data.setAmount(container.get(CommonKeys.ContentAmount, PersistentDataType.INTEGER));
+			data.setAmount(container.get(ItemKeys.ContentAmount, PersistentDataType.INTEGER));
 		}
 
 		tracked.put(block, data);
@@ -132,11 +132,11 @@ public class BarrelManager {
 		assert meta != null;
 
 		PersistentDataContainer container = meta.getPersistentDataContainer();
-		container.set(CommonKeys.Tier, PersistentDataType.INTEGER, data.getTier());
+		container.set(ItemKeys.Tier, PersistentDataType.INTEGER, data.getTier());
 
 		if (data.getType() != null) {
-			container.set(CommonKeys.ContentType, PersistentDataType.STRING, data.getType().toString());
-			container.set(CommonKeys.ContentAmount, PersistentDataType.INTEGER, data.getAmount());
+			container.set(ItemKeys.ContentType, PersistentDataType.STRING, data.getType().toString());
+			container.set(ItemKeys.ContentAmount, PersistentDataType.INTEGER, data.getAmount());
 		}
 
 		Bukkit.getScheduler().runTask(
